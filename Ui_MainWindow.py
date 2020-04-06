@@ -201,7 +201,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def btnNext_Click(self):
         try:
-
             if self.next_image is not None:
                 for label_btn in self.label_classes:
                     if self.label_classes[label_btn].selected:
@@ -222,6 +221,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.files = iter(files)
             except OSError:
                 self.statusbar.showMessage("")
+            except StopIteration:
+                self.statusbar.showMessage("Finished. Every file traversed successfully.")
+                pass
         else:
 
             max_width = self.scroll.geometry().width()-10
