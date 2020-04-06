@@ -184,7 +184,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def btnDeleteImage_Click(self):
         if self.next_image is not None:
-            source = os.path.join(self.src, self.next_image)
+            source = os.path.join(self.curr, self.next_image)
             os.remove(source)
             self.btnNext.click()
 
