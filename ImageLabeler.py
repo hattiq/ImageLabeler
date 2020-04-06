@@ -7,9 +7,9 @@ from Ui_MainWindow import Ui_MainWindow
 
 
 LABEL_CLASSES_DIRECTORIES = {
-            "Red": r"D:\FYP\Demo\sorted\red",
-            "Green": r"D:\FYP\Demo\sorted\green",
-            "Blue": r"D:\FYP\Demo\sorted\blue",
+            "Red": r".\Demo\sorted\red",
+            "Green": r".\Demo\sorted\green",
+            "Blue": r".\Demo\sorted\blue",
         }
 
 
@@ -19,15 +19,14 @@ class ImageLabeler:
     labeling technique.
     """
     @staticmethod
-    def show(src):
+    def show(src, label_classes_dict):
         """
         Initialize and start app.
 
         :param src: source directory from which images are to be taken; subdirectories included.
+        :label_classes_dict: A dict where keys are class names and values are directory paths.
         :return:
         """
-
-        label_classes_dict = LABEL_CLASSES_DIRECTORIES
 
         app = QtWidgets.QApplication(sys.argv)
         ui = Ui_MainWindow(label_classes_dict, src)
@@ -53,6 +52,19 @@ def __init_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def __create_if_not_exist_directories(dictionary: dict):
+    """
+    Creates directories out of the values of dictionary.
+
+    If directory exists, that's okay. Otherwise it is created.
+
+    :param dictionary: key value pairs, where values are directory paths.
+    :return: None.
+    """
+    for key, value in dictionary.items():
+        os.makedirs(value, exist_ok=True)
+
+
 if __name__ == "__main__":
     arg_parser = __init_arg_parser()
     args = arg_parser.parse_args()
@@ -61,4 +73,7 @@ if __name__ == "__main__":
 
     assert os.path.isdir(args.source_directory), f'Directory "{args.source_directory} does not exist"'
 
-    labeler.show(src=args.source_directory)
+    __create_if_not_exist_directories(LABEL_CLASSES_DIRECTORIES)
+
+    labeler.show(src=args.source_directory,
+                 label_classes_dict=LABEL_CLASSES_DIRECTORIES)
