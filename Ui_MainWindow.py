@@ -175,8 +175,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         )
         self.labelImageViewer.setPixmap(pixmap)
 
-        print(self.scaleFactor)
-
     def btnZoomIn_Click(self):
         if self.next_image is not None:
             self.scaleImage(1.15)
@@ -230,18 +228,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.statusbar.showMessage("Finished. Every file traversed successfully.")
                 pass
         else:
-
             max_width = self.scroll.geometry().width()-10
             max_height = self.scroll.geometry().height()-10
 
-            pixmap = QtGui.QPixmap(os.path.join(self.src, self.next_image))
-            self.current_pixmap = QtGui.QPixmap(os.path.join(self.src, self.next_image))
+            self.current_pixmap = QtGui.QPixmap(os.path.join(self.curr, self.next_image))
 
-            if pixmap.width() > max_width or pixmap.height() > max_height:
-                pixmap = pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+            if self.current_pixmap.width() > max_width or self.current_pixmap.height() > max_height:
                 self.current_pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
 
-            self.labelImageViewer.setPixmap(pixmap)
+            self.labelImageViewer.setPixmap(self.current_pixmap)
             self.scaleFactor = 1
 
         if self.next_image is not None:
