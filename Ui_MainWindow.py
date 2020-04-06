@@ -238,3 +238,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
             self.labelImageViewer.setPixmap(pixmap)
             self.scaleFactor = 1
+
+        if self.next_image is not None:
+            self.statusbar.showMessage(f"Current File: {self.curr}{os.path.sep}{self.next_image}")
+
