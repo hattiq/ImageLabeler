@@ -1,7 +1,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 import shutil
+import re
 
+
+FILE_EXTENSION_REGEX = re.compile(r"^.+\.((?:jpg)|(?:jpeg)|(?:png))$")
 
 
 class LabelClass():
@@ -209,7 +212,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         shutil.copyfile(source, destination)
 
             self.next_image = next(self.files)
-            while not (self.next_image.endswith(".jpg") or self.next_image.endswith(".jpeg") or self.next_image.endswith(".png")):
+            while not FILE_EXTENSION_REGEX.match(self.next_image):
                 self.next_image = next(self.files)
         except StopIteration:
             try:
