@@ -10,30 +10,30 @@ class LabelClass():
         self.btn = btn
         self.selected = False  # True: clicked , False: not clicked
 
-    def toggleOn(self, ):
+    def toggleOn(self):
         self.selected = True
         self.btn.setStyleSheet("background-color: red")
 
-    def toggleOff(self, ):
+    def toggleOff(self):
         self.selected = False
         self.btn.setStyleSheet("background-color: yellow")
 
 
-class Ui_MainWindow(QtWidgets.QWidget):
+class Ui_MainWindow(QtWidgets.QMainWindow):
 
-    def __init__(self, MainWindow, label_classes: dict, src: str):
+    def __init__(self, label_classes: dict, src: str):
         super(Ui_MainWindow, self).__init__()
         self.label_classes = label_classes
         self.src = src
         self.selected_btn = None
-        self.setupUi(MainWindow)
         self.files = iter(os.listdir(self.src))
+        self.initUi()
 
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1000, 750)
+    def initUi(self):
+        self.setObjectName("MainWindow")
+        self.resize(1000, 750)
 
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
 
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -43,7 +43,6 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.gridLayout.setContentsMargins(10, 10, 10, 10)
         self.gridLayout.setSpacing(10)
         self.gridLayout.setObjectName("gridLayout")
-        self.setLayout(self.gridLayout)
 
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
@@ -68,25 +67,97 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.btnNext.clicked.connect(self.btnNext_Click)
         self.gridLayout.addWidget(self.btnNext, 9, 1, 1, 1)
 
+        self.Hbox = QtWidgets.QHBoxLayout(self.gridLayoutWidget)
+        self.btnZoomIn = QtWidgets.QPushButton()
+        self.btnZoomIn.setMaximumSize(QtCore.QSize(200, 50))
+        self.btnZoomIn.setObjectName("btnbtnZoomIn")
+        self.btnZoomIn.setText("")
+        iconZoomIn = QtGui.QIcon()
+        iconZoomIn.addPixmap(QtGui.QPixmap("assets/zoom-in-16.png"))
+        self.btnZoomIn.setIcon(iconZoomIn)
+        self.btnZoomIn.setStyleSheet("background-color: transparent")
+
+        self.btnZoomOut = QtWidgets.QPushButton()
+        self.btnZoomOut.setMaximumSize(QtCore.QSize(200, 50))
+        self.btnZoomOut.setObjectName("btnbtnZoomOut")
+        self.btnZoomOut.setText("")
+        iconZoomOut = QtGui.QIcon()
+        iconZoomOut.addPixmap(QtGui.QPixmap("assets/zoom-out-16.png"))
+        self.btnZoomOut.setIcon(iconZoomOut)
+        self.btnZoomOut.setStyleSheet("background-color: transparent")
+
+        self.btnFitWidth = QtWidgets.QPushButton()
+        self.btnFitWidth.setMaximumSize(QtCore.QSize(200, 50))
+        self.btnFitWidth.setObjectName("btnbtnZoomOut")
+        self.btnFitWidth.setText("")
+        iconFitWidth = QtGui.QIcon()
+        iconFitWidth.addPixmap(QtGui.QPixmap("assets/fit-to-width-16.png"))
+        self.btnFitWidth.setIcon(iconFitWidth)
+        self.btnFitWidth.setStyleSheet("background-color: transparent")
+
+        self.btnDeleteImage = QtWidgets.QPushButton()
+        self.btnDeleteImage.setMaximumSize(QtCore.QSize(200, 50))
+        self.btnDeleteImage.setObjectName("btnbtnZoomOut")
+        self.btnDeleteImage.setText("")
+        iconDeleteImage = QtGui.QIcon()
+        iconDeleteImage.addPixmap(QtGui.QPixmap("assets/remove-image-16.png"))
+        self.btnDeleteImage.setIcon(iconDeleteImage)
+        self.btnDeleteImage.setStyleSheet("background-color: transparent")
+
+        self.Hbox.addWidget(self.btnZoomIn)
+        self.Hbox.addWidget(self.btnFitWidth)
+        self.Hbox.addWidget(self.btnZoomOut)
+        self.Hbox.addWidget(self.btnDeleteImage)
+        widget = QtWidgets.QWidget()
+        widget.setLayout(self.Hbox)
+        self.gridLayout.addWidget(widget, 10, 0, 1, 1)
+
         self.labelImageViewer = QtWidgets.QLabel(self.gridLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.labelImageViewer.setSizePolicy(sizePolicy)
         self.labelImageViewer.setText("")
-        self.labelImageViewer.setPixmap(QtGui.QPixmap("placeholder.jpg"))
-        self.labelImageViewer.setMaximumSize(QtCore.QSize(1000, 1000))
+        self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
         self.labelImageViewer.setObjectName("labelImageViewer")
-        self.gridLayout.addWidget(self.labelImageViewer, 0, 0, 10, 1)
+        self.labelImageViewer.setAlignment(QtCore.Qt.AlignCenter)
 
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.scroll = QtWidgets.QScrollArea()
+        self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.labelImageViewer)
+
+        self.gridLayout.addWidget(self.scroll, 0, 0, 10, 1)
+
+        self.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 816, 21))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        self.setStatusBar(self.statusbar)
 
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(self)
+
+        self.widget = QtWidgets.QWidget()
+        self.widget.setLayout(self.gridLayout)
+        self.setCentralWidget(self.widget)
+        self.widget.show()
+        self.setWindowTitle("Image Labeler")
+
+    def wheelEvent(self, a0: QtGui.QWheelEvent) -> None:
+        self.scaleImage(1.25)
+
+    def scaleImage(self, factor):
+        self.scaleFactor *= factor
+        self.labelImageViewer.resize(self.scaleFactor * self.labelImageViewer.pixmap().size())
+
+        self.adjustScrollBar(self.scroll.horizontalScrollBar(), factor)
+        self.adjustScrollBar(self.scroll.verticalScrollBar(), factor)
+
+    def adjustScrollBar(self, scrollBar, factor):
+        scrollBar.setValue(int(factor * scrollBar.value()
+                               + ((factor - 1) * scrollBar.pageStep() / 2)))
 
     def btnClass_Click(self):
         if self.next_image is not None:
@@ -109,10 +180,17 @@ class Ui_MainWindow(QtWidgets.QWidget):
                 self.next_image = next(self.files)
         except StopIteration:
             self.next_image = None
+            self.labelImageViewer.setPixmap(QtGui.QPixmap("placeholder.jpg"))
         except OSError:
             pass
         else:
 
+            max_width = self.labelImageViewer.geometry().width()
+            max_height = self.labelImageViewer.geometry().height()
+
             pixmap = QtGui.QPixmap(os.path.join(self.src, self.next_image))
-            pixmap = pixmap.scaled(750, 750, QtCore.Qt.KeepAspectRatio)
+
+            if pixmap.width() > max_width or pixmap.height() > max_height:
+                pixmap = pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+
             self.labelImageViewer.setPixmap(pixmap)

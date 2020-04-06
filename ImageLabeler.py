@@ -15,8 +15,7 @@ class ImageLabeler:
         }
 
         app = QtWidgets.QApplication(sys.argv)
-        MainWindow = QtWidgets.QMainWindow()
-        ui = Ui_MainWindow(MainWindow, label_classes_dict, src)
+        ui = Ui_MainWindow(label_classes_dict, src)
         ui.show()
         sys.exit(app.exec_())
 
