@@ -217,6 +217,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         shutil.copyfile(source, destination)
                         self.fileCounter += 1
                         isCopied = True
+                        self.label_classes[label_btn].toggle()
                 if isCopied:
                     os.remove(source)
 
