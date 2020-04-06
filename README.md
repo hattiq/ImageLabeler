@@ -8,6 +8,6 @@ $ pip install PyQt5
 ```
 
 # Run
-```python 
+```sh 
 $ python ImageLabeler.py
 ```
