@@ -225,8 +225,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
                 self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
                 self.statusbar.showMessage("No more images (jpg,jpeg,png) in current folder ("+self.curr+"). click next to walk to next directory")
-                self.curr, self.dirs, files = self.filesGen.__next__()
+
+                files = []
+                while not files:
+                    self.curr, self.dirs, files = self.filesGen.__next__()
                 self.files = iter(files)
+
             except OSError:
                 self.statusbar.showMessage("")
             except StopIteration:
