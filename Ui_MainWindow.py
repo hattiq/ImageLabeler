@@ -14,10 +14,10 @@ class LabelClass():
     def toggle(self):
         if self.selected:
             self.selected = False
-            self.btn.setStyleSheet("background-color: yellow")
+            self.btn.setStyleSheet("background-color: #bdc3c7")
         else:
             self.selected = True
-            self.btn.setStyleSheet("background-color: red")
+            self.btn.setStyleSheet("background-color: #2ecc71")
 
 
 
@@ -30,13 +30,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.selected_btn = None
         self.next_image = None
         self.filesGen = os.walk(src)
-        self.curr,self.dirs,files = self.filesGen.__next__()
+        self.curr, self.dirs, files = self.filesGen.__next__()
         self.files = iter(files)
         self.initUi()
 
     def initUi(self):
         self.setObjectName("MainWindow")
-        self.resize(1000, 750)
+        self.resize(800, 600)
 
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
@@ -58,6 +58,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             btn.setMaximumSize(QtCore.QSize(200, 50))
             btn.setObjectName("btn" + c)
             btn.setText(c)
+            btn.setStyleSheet("background-color: #bdc3c7")
             btn.clicked.connect(self.btnClass_Click)
             self.gridLayout.addWidget(btn, row, 1, 1, 1)
             self.label_classes[c] = LabelClass(c, self.label_classes[c], btn)
@@ -69,6 +70,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.btnNext.setMaximumSize(QtCore.QSize(200, 50))
         self.btnNext.setObjectName("btnNext")
         self.btnNext.setText("Next")
+        self.btnNext.setStyleSheet("background-color: #3498db")
         self.btnNext.clicked.connect(self.btnNext_Click)
         self.gridLayout.addWidget(self.btnNext, 9, 1, 1, 1)
 
@@ -216,7 +218,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
                 self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
                 self.statusbar.showMessage("No more images (jpg,jpeg,png) in current folder ("+self.curr+"). click next to walk to next directory")
-                self.curr,self.dirs,files = self.filesGen.__next__()
+                self.curr, self.dirs, files = self.filesGen.__next__()
                 self.files = iter(files)
             except OSError:
                 self.statusbar.showMessage("")

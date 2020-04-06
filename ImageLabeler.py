@@ -1,13 +1,15 @@
 import sys
 import argparse
+import os
 
 from PyQt5 import QtWidgets
 from Ui_MainWindow import Ui_MainWindow
 
 
 LABEL_CLASSES_DIRECTORIES = {
-            "Personal": r"C:\Users\hatti\Desktop\Personal",
-            "Work": r"C:\Users\hatti\Desktop\Work"
+            "Red": r"D:\FYP\Demo\sorted\red",
+            "Green": r"D:\FYP\Demo\sorted\green",
+            "Blue": r"D:\FYP\Demo\sorted\blue",
         }
 
 
@@ -56,4 +58,7 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
 
     labeler = ImageLabeler()
+
+    assert os.path.isdir(args.source_directory), f'Directory "{args.source_directory} does not exist"'
+
     labeler.show(src=args.source_directory)
