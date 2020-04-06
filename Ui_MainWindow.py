@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
-import sys
+import shutil
+
 
 
 class LabelClass():
@@ -10,13 +11,14 @@ class LabelClass():
         self.btn = btn
         self.selected = False  # True: clicked , False: not clicked
 
-    def toggleOn(self):
-        self.selected = True
-        self.btn.setStyleSheet("background-color: red")
+    def toggle(self):
+        if self.selected:
+            self.selected = False
+            self.btn.setStyleSheet("background-color: yellow")
+        else:
+            self.selected = True
+            self.btn.setStyleSheet("background-color: red")
 
-    def toggleOff(self):
-        self.selected = False
-        self.btn.setStyleSheet("background-color: yellow")
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -26,7 +28,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_classes = label_classes
         self.src = src
         self.selected_btn = None
-        self.files = iter(os.listdir(self.src))
+        self.next_image = None
+        self.filesGen = os.walk(src)
+        self.curr,self.dirs,files = self.filesGen.__next__()
+        self.files = iter(files)
         self.initUi()
 
     def initUi(self):
@@ -70,39 +75,39 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Hbox = QtWidgets.QHBoxLayout(self.gridLayoutWidget)
         self.btnZoomIn = QtWidgets.QPushButton()
         self.btnZoomIn.setMaximumSize(QtCore.QSize(200, 50))
-        self.btnZoomIn.setObjectName("btnbtnZoomIn")
-        self.btnZoomIn.setText("")
+        self.btnZoomIn.setObjectName("btnZoomIn")
+        self.btnZoomIn.setText("Zoom in")
         iconZoomIn = QtGui.QIcon()
         iconZoomIn.addPixmap(QtGui.QPixmap("assets/zoom-in-16.png"))
         self.btnZoomIn.setIcon(iconZoomIn)
-        self.btnZoomIn.setStyleSheet("background-color: transparent")
+        self.btnZoomIn.clicked.connect(self.btnZoomIn_Click)
 
         self.btnZoomOut = QtWidgets.QPushButton()
         self.btnZoomOut.setMaximumSize(QtCore.QSize(200, 50))
         self.btnZoomOut.setObjectName("btnbtnZoomOut")
-        self.btnZoomOut.setText("")
+        self.btnZoomOut.setText("Zoom out")
         iconZoomOut = QtGui.QIcon()
         iconZoomOut.addPixmap(QtGui.QPixmap("assets/zoom-out-16.png"))
         self.btnZoomOut.setIcon(iconZoomOut)
-        self.btnZoomOut.setStyleSheet("background-color: transparent")
+        self.btnZoomOut.clicked.connect(self.btnZoomOut_Click)
 
         self.btnFitWidth = QtWidgets.QPushButton()
         self.btnFitWidth.setMaximumSize(QtCore.QSize(200, 50))
-        self.btnFitWidth.setObjectName("btnbtnZoomOut")
-        self.btnFitWidth.setText("")
+        self.btnFitWidth.setObjectName("btnZoomOut")
+        self.btnFitWidth.setText("Fit Size")
         iconFitWidth = QtGui.QIcon()
         iconFitWidth.addPixmap(QtGui.QPixmap("assets/fit-to-width-16.png"))
         self.btnFitWidth.setIcon(iconFitWidth)
-        self.btnFitWidth.setStyleSheet("background-color: transparent")
+        self.btnFitWidth.clicked.connect(self.btnFitWidth_Click)
 
         self.btnDeleteImage = QtWidgets.QPushButton()
         self.btnDeleteImage.setMaximumSize(QtCore.QSize(200, 50))
-        self.btnDeleteImage.setObjectName("btnbtnZoomOut")
-        self.btnDeleteImage.setText("")
+        self.btnDeleteImage.setObjectName("btnDeleteImage")
+        self.btnDeleteImage.setText("Delete Image")
         iconDeleteImage = QtGui.QIcon()
         iconDeleteImage.addPixmap(QtGui.QPixmap("assets/remove-image-16.png"))
         self.btnDeleteImage.setIcon(iconDeleteImage)
-        self.btnDeleteImage.setStyleSheet("background-color: transparent")
+        self.btnDeleteImage.clicked.connect(self.btnDeleteImage_Click)
 
         self.Hbox.addWidget(self.btnZoomIn)
         self.Hbox.addWidget(self.btnFitWidth)
@@ -145,52 +150,84 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.widget.show()
         self.setWindowTitle("Image Labeler")
 
-    def wheelEvent(self, a0: QtGui.QWheelEvent) -> None:
-        self.scaleImage(1.25)
+        self.scaleFactor = 1
+        self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
 
     def scaleImage(self, factor):
-        self.scaleFactor *= factor
-        self.labelImageViewer.resize(self.scaleFactor * self.labelImageViewer.pixmap().size())
+        if factor * self.scaleFactor > 2:
+            self.scaleFactor = 2
+        elif factor * self.scaleFactor < 1:
+            self.scaleFactor = 1
+        else:
+            self.scaleFactor *= factor
 
-        self.adjustScrollBar(self.scroll.horizontalScrollBar(), factor)
-        self.adjustScrollBar(self.scroll.verticalScrollBar(), factor)
+        pixmap = self.labelImageViewer.pixmap().scaled(
+            self.scaleFactor * self.current_pixmap.size().width(),
+            self.scaleFactor * self.current_pixmap.size().height()
+        )
+        self.labelImageViewer.setPixmap(pixmap)
 
-    def adjustScrollBar(self, scrollBar, factor):
-        scrollBar.setValue(int(factor * scrollBar.value()
-                               + ((factor - 1) * scrollBar.pageStep() / 2)))
+        print(self.scaleFactor)
+
+    def btnZoomIn_Click(self):
+        self.scaleImage(1.15)
+
+    def btnDeleteImage_Click(self):
+        if self.next_image is not None:
+            source = os.path.join(self.src, self.next_image)
+            os.remove(source)
+            self.btnNext.click()
+
+    def btnFitWidth_Click(self):
+        max_width = self.scroll.geometry().width() - 10
+        max_height = self.scroll.geometry().height() - 10
+
+        pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+        self.labelImageViewer.setPixmap(pixmap)
+
+    def btnZoomOut_Click(self):
+        self.scaleImage(0.85)
 
     def btnClass_Click(self):
         if self.next_image is not None:
             sender = self.sender().text()
-            if self.selected_btn is not None:
-                self.label_classes[self.selected_btn].toggleOff()
-            self.selected_btn = sender
-            self.label_classes[self.selected_btn].toggleOn()
+            self.label_classes[self.selected_btn].toggle()
 
     def btnNext_Click(self):
         try:
 
-            if self.selected_btn is not None:
-                source = os.path.join(self.src, self.next_image)
-                destination = os.path.join(self.src, self.label_classes[self.selected_btn].dst, self.next_image)
-                os.rename(source, destination)
+            if self.next_image is not None:
+                for label_btn in self.label_classes:
+                    if self.label_classes[label_btn].selected:
+                        source = os.path.join(self.src, self.next_image)
+                        destination = os.path.join(self.src, self.label_classes[label_btn].dst, self.next_image)
+                        shutil.copyfile(source, destination)
 
             self.next_image = next(self.files)
             while not (self.next_image.endswith(".jpg") or self.next_image.endswith(".jpeg") or self.next_image.endswith(".png")):
                 self.next_image = next(self.files)
         except StopIteration:
-            self.next_image = None
-            self.labelImageViewer.setPixmap(QtGui.QPixmap("placeholder.jpg"))
-        except OSError:
-            pass
+            try:
+                self.next_image = None
+                self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
+                self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
+                self.statusbar.showMessage("No more images (jpg,jpeg,png) in current folder ("+self.curr+"). click next to walk to next directory")
+                self.curr,self.dirs,files = self.filesGen.__next__()
+                self.files = iter(files)
+            except OSError:
+                self.statusbar.showMessage("")
         else:
 
-            max_width = self.labelImageViewer.geometry().width()
-            max_height = self.labelImageViewer.geometry().height()
+            max_width = self.scroll.geometry().width()-10
+            max_height = self.scroll.geometry().height()-10
 
             pixmap = QtGui.QPixmap(os.path.join(self.src, self.next_image))
+            self.current_pixmap = QtGui.QPixmap(os.path.join(self.src, self.next_image))
 
             if pixmap.width() > max_width or pixmap.height() > max_height:
                 pixmap = pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+                self.current_pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
 
             self.labelImageViewer.setPixmap(pixmap)
+
+            self.scaleFactor = 1
