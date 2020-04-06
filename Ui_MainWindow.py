@@ -35,6 +35,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.filesGen = os.walk(src)
         self.curr, self.dirs, files = self.filesGen.__next__()
         self.files = iter(files)
+
+        self.fileCounter = 0
+
         self.initUi()
 
     def initUi(self):
@@ -207,9 +210,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             if self.next_image is not None:
                 for label_btn in self.label_classes:
                     if self.label_classes[label_btn].selected:
-                        source = os.path.join(self.src, self.next_image)
-                        destination = os.path.join(self.src, self.label_classes[label_btn].dst, self.next_image)
+                        source = os.path.join(self.curr, self.next_image)
+                        destination = os.path.join(self.label_classes[label_btn].dst,
+                                                   str(self.fileCounter) + self.next_image)
                         shutil.copyfile(source, destination)
+                        self.fileCounter += 1
 
             self.next_image = next(self.files)
             while not FILE_EXTENSION_REGEX.match(self.next_image):
