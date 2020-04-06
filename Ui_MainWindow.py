@@ -154,12 +154,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
 
     def scaleImage(self, factor):
-        if factor * self.scaleFactor > 2:
-            self.scaleFactor = 2
-        elif factor * self.scaleFactor < 1:
-            self.scaleFactor = 1
-        else:
-            self.scaleFactor *= factor
+        if self.next_image is not None:
+            if factor * self.scaleFactor > 2:
+                self.scaleFactor = 2
+            elif factor * self.scaleFactor < 1:
+                self.scaleFactor = 1
+            else:
+                self.scaleFactor *= factor
 
         pixmap = self.labelImageViewer.pixmap().scaled(
             self.scaleFactor * self.current_pixmap.size().width(),
@@ -170,7 +171,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print(self.scaleFactor)
 
     def btnZoomIn_Click(self):
-        self.scaleImage(1.15)
+        if self.next_image is not None:
+            self.scaleImage(1.15)
 
     def btnDeleteImage_Click(self):
         if self.next_image is not None:
@@ -179,19 +181,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.btnNext.click()
 
     def btnFitWidth_Click(self):
-        max_width = self.scroll.geometry().width() - 10
-        max_height = self.scroll.geometry().height() - 10
+        if self.next_image is not None:
+            max_width = self.scroll.geometry().width() - 10
+            max_height = self.scroll.geometry().height() - 10
 
-        pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
-        self.labelImageViewer.setPixmap(pixmap)
+            pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+            self.labelImageViewer.setPixmap(pixmap)
 
     def btnZoomOut_Click(self):
-        self.scaleImage(0.85)
+        if self.next_image is not None:
+            self.scaleImage(0.85)
 
     def btnClass_Click(self):
         if self.next_image is not None:
             sender = self.sender().text()
-            self.label_classes[self.selected_btn].toggle()
+            self.label_classes[sender].toggle()
 
     def btnNext_Click(self):
         try:
@@ -229,5 +233,4 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.current_pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
 
             self.labelImageViewer.setPixmap(pixmap)
-
             self.scaleFactor = 1
