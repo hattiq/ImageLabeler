@@ -158,6 +158,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.scaleFactor = 1
         self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
 
+        self.statusbar.showMessage("Press Next to start.")
+
     def scaleImage(self, factor):
         if self.next_image is not None:
             if factor * self.scaleFactor > 2:
