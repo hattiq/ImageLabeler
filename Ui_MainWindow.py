@@ -208,13 +208,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def btnNext_Click(self):
         try:
             if self.next_image is not None:
+                isCopied = False
+                source = os.path.join(self.curr, self.next_image)
                 for label_btn in self.label_classes:
                     if self.label_classes[label_btn].selected:
-                        source = os.path.join(self.curr, self.next_image)
                         destination = os.path.join(self.label_classes[label_btn].dst,
-                                                   str(self.fileCounter) + self.next_image)
+                                                   f'{self.fileCounter} {self.next_image}')
                         shutil.copyfile(source, destination)
                         self.fileCounter += 1
+                        isCopied = True
+                if isCopied:
+                    os.remove(source)
 
             self.next_image = next(self.files)
             while not FILE_EXTENSION_REGEX.match(self.next_image):
