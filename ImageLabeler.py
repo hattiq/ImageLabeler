@@ -18,13 +18,14 @@ class ImageLabeler:
     App to copy images from one folder to multiple folders. This could be effectively used as a sorting and
     labeling technique.
     """
+
     @staticmethod
     def show(src, label_classes_dict):
         """
         Initialize and start app.
 
         :param src: source directory from which images are to be taken; subdirectories included.
-        :label_classes_dict: A dict where keys are class names and values are directory paths.
+        :param label_classes_dict: A dict where keys are class names and values are directory paths.
         :return:
         """
 
