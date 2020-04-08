@@ -38,6 +38,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.files = iter(files)
 
         self.fileCounter = 0
+        self.filesLabeled = 0
 
         self.initUi()
 
@@ -222,6 +223,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         self.label_classes[label_btn].toggle()
                 if isCopied:
                     os.remove(source)
+                    self.filesLabeled += 1
+                    self.setWindowTitle(f'Image Labeler | {self.filesLabeled} files labeled')
 
             self.next_image = next(self.files)
             while not FILE_EXTENSION_REGEX.match(self.next_image):
