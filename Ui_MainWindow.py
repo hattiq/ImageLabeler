@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 import shutil
 import re
+import time
 
 
 FILE_EXTENSION_REGEX = re.compile(r"^.+\.((?:jpg)|(?:jpeg)|(?:png))$")
@@ -212,8 +213,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 source = os.path.join(self.curr, self.next_image)
                 for label_btn in self.label_classes:
                     if self.label_classes[label_btn].selected:
-                        destination = os.path.join(self.label_classes[label_btn].dst,
-                                                   f'{self.fileCounter} {self.next_image}')
+                        destination = os.path.join(
+                            self.label_classes[label_btn].dst,
+                            f'{Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image}')
                         shutil.copyfile(source, destination)
                         self.fileCounter += 1
                         isCopied = True
@@ -229,7 +231,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.next_image = None
                 self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
                 self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
-                self.statusbar.showMessage("No more images (jpg,jpeg,png) in current folder ("+self.curr+"). click next to walk to next directory")
+                self.statusbar.showMessage("No more images (jpg,jpeg,png) in current folder ("+self.curr +
+                                           "). click next to walk to next directory")
 
                 files = []
                 while not files:
@@ -256,3 +259,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if self.next_image is not None:
             self.statusbar.showMessage(f"Current File: {self.curr}{os.path.sep}{self.next_image}")
 
+    @staticmethod
+    def __current_milli_time() -> int:
+        return int(round(time.time() * 1000))
