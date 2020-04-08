@@ -80,7 +80,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.btnNext.setText("Next")
         self.btnNext.setStyleSheet("background-color: #3498db")
         self.btnNext.clicked.connect(self.btnNext_Click)
-        self.gridLayout.addWidget(self.btnNext, 9, 1, 1, 1)
+        self.gridLayout.addWidget(self.btnNext, 10, 1, 1, 1)
+
+        self.btnReset = QtWidgets.QPushButton(self.gridLayoutWidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.btnReset.setSizePolicy(sizePolicy)
+        self.btnReset.setMaximumSize(QtCore.QSize(200, 50))
+        self.btnReset.setObjectName("btnReset")
+        self.btnReset.setText("Reset")
+        self.btnReset.setStyleSheet("background-color: #bdc3c7")
+        self.btnReset.clicked.connect(self.btnReset_Click)
+        self.gridLayout.addWidget(self.btnReset, 9, 1, 1, 1)
 
         self.Hbox = QtWidgets.QHBoxLayout(self.gridLayoutWidget)
         self.btnZoomIn = QtWidgets.QPushButton()
@@ -206,6 +216,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if self.next_image is not None:
             sender = self.sender().text()
             self.label_classes[sender].toggle()
+
+    def btnReset_Click(self):
+        for label_btn in self.label_classes:
+            if self.label_classes[label_btn].selected:
+                self.label_classes[label_btn].toggle()
 
     def btnNext_Click(self):
         try:
