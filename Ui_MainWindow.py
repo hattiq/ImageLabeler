@@ -234,33 +234,35 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.next_image = None
                 self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
                 self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
-                self.statusbar.showMessage("No more images (jpg,jpeg,png) in current folder ("+self.curr +
-                                           "). click next to walk to next directory")
+                self.statusbar.showMessage(f'Directory Complete. Click Next to continue.')
 
                 files = []
                 while not files:
                     self.curr, self.dirs, files = self.filesGen.__next__()
                 self.files = iter(files)
-
+                self.next_image = next(self.files)
+                self.__showImageInViewer()
             except OSError:
                 self.statusbar.showMessage("")
             except StopIteration:
                 self.statusbar.showMessage("Finished. Every file traversed successfully.")
-                pass
         else:
-            max_width = self.scroll.geometry().width()-10
-            max_height = self.scroll.geometry().height()-10
-
-            self.current_pixmap = QtGui.QPixmap(os.path.join(self.curr, self.next_image))
-
-            if self.current_pixmap.width() > max_width or self.current_pixmap.height() > max_height:
-                self.current_pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
-
-            self.labelImageViewer.setPixmap(self.current_pixmap)
-            self.scaleFactor = 1
+            self.__showImageInViewer()
 
         if self.next_image is not None:
             self.statusbar.showMessage(f"Current File: {self.curr}{os.path.sep}{self.next_image}")
+
+    def __showImageInViewer(self):
+        max_width = self.scroll.geometry().width() - 10
+        max_height = self.scroll.geometry().height() - 10
+
+        self.current_pixmap = QtGui.QPixmap(os.path.join(self.curr, self.next_image))
+
+        if self.current_pixmap.width() > max_width or self.current_pixmap.height() > max_height:
+            self.current_pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+
+        self.labelImageViewer.setPixmap(self.current_pixmap)
+        self.scaleFactor = 1
 
     @staticmethod
     def __current_milli_time() -> int:
