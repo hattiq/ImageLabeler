@@ -241,31 +241,31 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     self.filesLabeled += 1
                     self.setWindowTitle(f'Image Labeler | {self.filesLabeled} files labeled')
 
-            self.next_image = next(self.files)
-            while not FILE_EXTENSION_REGEX.match(self.next_image):
-                self.next_image = next(self.files)
+            self.__find_next_image()
         except StopIteration:
-            try:
-                self.next_image = None
-                self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
-                self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
-                self.statusbar.showMessage(f'Directory Complete. Click Next to continue.')
-
-                files = []
-                while not files:
-                    self.curr, self.dirs, files = self.filesGen.__next__()
-                self.files = iter(files)
-                self.next_image = next(self.files)
-                self.__showImageInViewer()
-            except OSError:
-                self.statusbar.showMessage("")
-            except StopIteration:
-                self.statusbar.showMessage("Finished. Every file traversed successfully.")
+            self.next_image = None
+            self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
+            self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
+            self.statusbar.showMessage("Finished. Every file traversed successfully.")
         else:
             self.__showImageInViewer()
 
         if self.next_image is not None:
             self.statusbar.showMessage(f"Current File: {self.curr}{os.path.sep}{self.next_image}")
+
+    def __find_next_image(self):
+        nextImageFound = False
+        while not nextImageFound:
+            try:
+                self.next_image = next(self.files)
+                while not FILE_EXTENSION_REGEX.match(self.next_image):
+                    self.next_image = next(self.files)
+                nextImageFound = True
+            except StopIteration:
+                files = []
+                while not files:
+                    self.curr, self.dirs, files = self.filesGen.__next__()
+                self.files = iter(files)
 
     def __showImageInViewer(self):
         max_width = self.scroll.geometry().width() - 10
