@@ -4,14 +4,13 @@ import shutil
 import re
 import time
 
+from LabelUtilities import LabelMaker, LabelFormatterInterface
 
 FILE_EXTENSION_REGEX = re.compile(r"^.+\.((?:jpg)|(?:jpeg)|(?:png))$")
 
 
-class LabelClass():
-    def __init__(self, name: str, dst: str, btn):
-        self.name = name
-        self.dst = dst
+class LabelClassButton:
+    def __init__(self, btn):
         self.btn = btn
         self.selected = False  # True: clicked , False: not clicked
 
@@ -27,10 +26,13 @@ class LabelClass():
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
-    def __init__(self, label_classes: dict, src: str):
+    def __init__(self, label_classes: [str], src: str, des: str, bak: str, labelFormatter: LabelFormatterInterface):
         super(Ui_MainWindow, self).__init__()
         self.label_classes = label_classes
+        self.label_classes_buttons = {}
         self.src = src
+        self.des = des
+        self.bak = bak
         self.selected_btn = None
         self.next_image = None
         self.filesGen = os.walk(src)
@@ -39,6 +41,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.fileCounter = 0
         self.filesLabeled = 0
+
+        self.labelMaker = LabelMaker(self.label_classes)
+        self.labelFormatter = labelFormatter
 
         self.initUi()
 
@@ -69,7 +74,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             btn.setStyleSheet("background-color: #bdc3c7")
             btn.clicked.connect(self.btnClass_Click)
             self.gridLayout.addWidget(btn, row, 1, 1, 1)
-            self.label_classes[c] = LabelClass(c, self.label_classes[c], btn)
+            self.label_classes_buttons[c] = LabelClassButton(btn)
             row += 1
 
         self.btnNext = QtWidgets.QPushButton(self.gridLayoutWidget)
@@ -215,31 +220,41 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def btnClass_Click(self):
         if self.next_image is not None:
             sender = self.sender().text()
-            self.label_classes[sender].toggle()
+            self.label_classes_buttons[sender].toggle()
+            self.labelMaker.toggle(sender)
+
 
     def btnReset_Click(self):
-        for label_btn in self.label_classes:
-            if self.label_classes[label_btn].selected:
-                self.label_classes[label_btn].toggle()
+        for className in self.label_classes:
+            if self.label_classes_buttons[className].selected:
+                self.label_classes_buttons[className].toggle()
+                self.labelMaker.toggle(className)
 
     def btnNext_Click(self):
         try:
             if self.next_image is not None:
-                isCopied = False
                 source = os.path.join(self.curr, self.next_image)
-                for label_btn in self.label_classes:
-                    if self.label_classes[label_btn].selected:
-                        destination = os.path.join(
-                            self.label_classes[label_btn].dst,
-                            f'{Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image}')
-                        shutil.copyfile(source, destination)
-                        self.fileCounter += 1
-                        isCopied = True
-                        # self.label_classes[label_btn].toggle()
-                if isCopied:
-                    os.remove(source)
+                label = self.labelMaker.label
+
+                if sum(label.values()) == 0 and self.bak is not None:
+                    destination = os.path.join(
+                        self.bak,
+                        f'{Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image}')
+                    shutil.copyfile(source, destination)
+                else:
+                    formattedLabel = self.labelFormatter.getFormattedLabel(label)
+
+                    destination = os.path.join(
+                        self.des,
+                        f'{formattedLabel} _ {Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image}')
+
+                    shutil.copyfile(source, destination)
+
                     self.filesLabeled += 1
                     self.setWindowTitle(f'Image Labeler | {self.filesLabeled} files labeled')
+
+                os.remove(source)
+                self.fileCounter += 1
 
             self.__find_next_image()
         except StopIteration:
