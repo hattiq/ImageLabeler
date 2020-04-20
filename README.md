@@ -1,6 +1,6 @@
 # ImageLabeler
 
-GUI tool to copy images into specific folders. A single image is copied to all the folders you selected. The original image is deleted, but only if it was copied.
+GUI tool to label images. Labels are appended at the front of the image filename. The images are taken from a source directory and the labeled images are placed in the destination directory.
 
 ![ImageLabeler Screenshot](https://i.imgur.com/p1tB2LK.jpg)
 
@@ -18,29 +18,37 @@ $ pip install PyQt5
 
 ### Configure
 
-`LABEL_CLASSES_DIRECTORIES` in [ImageLabeler.py](./ImageLabeler.py) can be updated to configure the labeler.
-This is a `dict`, whose keys represent labels or button text, while values are directory paths. 
+`LABEL_CLASSES` in [ImageLabeler.py](./ImageLabeler.py) can be updated to configure the labeler.
+This is a `list`, with class names. The positions of the class names matter, as the buttons and labels will follow this positioning.
 
 ### Run 
 
 ```bash
-usage: ImageLabeler.py [-h] source_directory
+usage: ImageLabeler.py [-h] [-b BACKUP_DIRECTORY]
+                       source_directory destination_directory
 
-Run this app to copy a single file into multiple folders as a labeling
-technique.
+Run this app to label images by appending the label at the front of the
+filename.
 
 positional arguments:
-  source_directory  Directory from where images will we be
-                    taken.Subdirectories included.
+  source_directory      Directory from where images will we be
+                        taken.Subdirectories included.
+  destination_directory
+                        Directory where labeled images will be stored.
 
 optional arguments:
-  -h, --help        show this help message and exit
+  -h, --help            show this help message and exit
+  -b BACKUP_DIRECTORY, --backup-directory BACKUP_DIRECTORY
+                        Directory to store images that were left unlabeled.
+                        Leaving this option willadd a label to the image as
+                        per the label formatter used in code.
+
 ```
 
 **Example**
 
 ```bash
-$ python ImageLabeler.py src_dir
+$ python ImageLabeler.py src_dir des_dir -b unlabeled_dir
 ```
 
 ## Demo
@@ -48,7 +56,8 @@ $ python ImageLabeler.py src_dir
 Clone the repo. Run the demo using the following command. 
 
 ```bash
-$ python ImageLabeler.py ./Demo/unsorted
+$ python ImageLabeler.py ./Demo/unsorted ./Demo/sorted -b ./Demo/unlabeled
 ```
 
-Copied files will be stored in `./Demo/sorted/*` where `*` represents different labels.
+## LabelFormatter
+You can define your own `LabelFormatter`. Check out [LabelUtilities.py](./LabelUtilities.py).
