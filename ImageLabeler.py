@@ -9,7 +9,7 @@ from Ui_MainWindow import Ui_MainWindow
 
 
 # Positions matters
-LABEL_CLASSES = ["A", "B", "D", "P", "Bl", "Clean"]
+LABEL_CLASSES = ["A", "B", "D", "P", "Bl", "Conflict"]
 
 
 class ImageLabeler:

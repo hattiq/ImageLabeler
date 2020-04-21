@@ -77,6 +77,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.label_classes_buttons[c] = LabelClassButton(btn)
             row += 1
 
+        self.btnReset = QtWidgets.QPushButton(self.gridLayoutWidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.btnReset.setSizePolicy(sizePolicy)
+        self.btnReset.setMaximumSize(QtCore.QSize(200, 50))
+        self.btnReset.setObjectName("btnReset")
+        self.btnReset.setText("Reset")
+        self.btnReset.setStyleSheet("background-color: #bdc3c7")
+        self.btnReset.clicked.connect(self.btnReset_Click)
+        self.gridLayout.addWidget(self.btnReset, 8, 1, 1, 1)
+
         self.btnNext = QtWidgets.QPushButton(self.gridLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.btnNext.setSizePolicy(sizePolicy)
@@ -87,15 +97,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.btnNext.clicked.connect(self.btnNext_Click)
         self.gridLayout.addWidget(self.btnNext, 10, 1, 1, 1)
 
-        self.btnReset = QtWidgets.QPushButton(self.gridLayoutWidget)
+        self.btnSkip = QtWidgets.QPushButton(self.gridLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.btnReset.setSizePolicy(sizePolicy)
-        self.btnReset.setMaximumSize(QtCore.QSize(200, 50))
-        self.btnReset.setObjectName("btnReset")
-        self.btnReset.setText("Reset")
-        self.btnReset.setStyleSheet("background-color: #bdc3c7")
-        self.btnReset.clicked.connect(self.btnReset_Click)
-        self.gridLayout.addWidget(self.btnReset, 9, 1, 1, 1)
+        self.btnSkip.setSizePolicy(sizePolicy)
+        self.btnSkip.setMaximumSize(QtCore.QSize(200, 50))
+        self.btnSkip.setObjectName("btnSkip")
+        self.btnSkip.setText("Skip")
+        self.btnSkip.setStyleSheet("background-color: #bdc3c7")
+        self.btnSkip.clicked.connect(self.btnSkip_Click)
+        self.gridLayout.addWidget(self.btnSkip, 9, 1, 1, 1)
 
         self.Hbox = QtWidgets.QHBoxLayout(self.gridLayoutWidget)
         self.btnZoomIn = QtWidgets.QPushButton()
@@ -223,39 +233,46 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.label_classes_buttons[sender].toggle()
             self.labelMaker.toggle(sender)
 
-
     def btnReset_Click(self):
         for className in self.label_classes:
             if self.label_classes_buttons[className].selected:
                 self.label_classes_buttons[className].toggle()
                 self.labelMaker.toggle(className)
 
+    def btnSkip_Click(self):
+        if self.next_image is not None:
+            source = os.path.join(self.curr, self.next_image)
+            destination = os.path.join(
+                self.bak,
+                f'{Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image[-10:]}')
+            shutil.copyfile(source, destination)
+            os.remove(source)
+            self.fileCounter += 1
+
+        self.loadNextImage()
+
     def btnNext_Click(self):
+        if self.next_image is not None:
+            source = os.path.join(self.curr, self.next_image)
+            label = self.labelMaker.label
+
+            formattedLabel = self.labelFormatter.getFormattedLabel(label)
+
+            destination = os.path.join(
+                self.des,
+                f'{formattedLabel} _ {Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image[-10:]}')
+
+            shutil.copyfile(source, destination)
+
+            self.filesLabeled += 1
+            self.setWindowTitle(f'Image Labeler | {self.filesLabeled} files labeled')
+
+            os.remove(source)
+            self.fileCounter += 1
+        self.loadNextImage()
+
+    def loadNextImage(self):
         try:
-            if self.next_image is not None:
-                source = os.path.join(self.curr, self.next_image)
-                label = self.labelMaker.label
-
-                if sum(label.values()) == 0 and self.bak is not None:
-                    destination = os.path.join(
-                        self.bak,
-                        f'{Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image}')
-                    shutil.copyfile(source, destination)
-                else:
-                    formattedLabel = self.labelFormatter.getFormattedLabel(label)
-
-                    destination = os.path.join(
-                        self.des,
-                        f'{formattedLabel} _ {Ui_MainWindow.__current_milli_time()}{self.fileCounter} {self.next_image}')
-
-                    shutil.copyfile(source, destination)
-
-                    self.filesLabeled += 1
-                    self.setWindowTitle(f'Image Labeler | {self.filesLabeled} files labeled')
-
-                os.remove(source)
-                self.fileCounter += 1
-
             self.__find_next_image()
         except StopIteration:
             self.next_image = None
