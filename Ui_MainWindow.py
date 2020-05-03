@@ -213,7 +213,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if self.next_image is not None:
             source = os.path.join(self.curr, self.next_image)
             os.remove(source)
-            self.btnNext.click()
+            self.loadNextImage()
 
     def btnFitWidth_Click(self):
         if self.next_image is not None:
