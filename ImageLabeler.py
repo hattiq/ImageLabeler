@@ -9,7 +9,7 @@ from LabelUtilities import (LabelFormatterInterface,
 from Ui_MainWindow import Ui_MainWindow
 
 # Positions matters
-LABEL_CLASSES = ["A", "B", "D", "P", "Bl", "Conflict"]
+LABEL_CLASSES = ["Red", "Green", "Blue"]
 
 
 class ImageLabeler:
