@@ -1,10 +1,11 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
 import os
-import shutil
 import re
+import shutil
 import time
 
-from LabelUtilities import LabelMaker, LabelFormatterInterface
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+from LabelUtilities import LabelFormatterInterface, LabelMaker
 
 FILE_EXTENSION_REGEX = re.compile(r"^.+\.((?:jpg)|(?:jpeg)|(?:png))$")
 
@@ -21,7 +22,6 @@ class LabelClassButton:
         else:
             self.selected = True
             self.btn.setStyleSheet("background-color: #2ecc71")
-
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -57,12 +57,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
+        self.gridLayout.setSizeConstraint(
+            QtWidgets.QLayout.SetDefaultConstraint)
         self.gridLayout.setContentsMargins(10, 10, 10, 10)
         self.gridLayout.setSpacing(10)
         self.gridLayout.setObjectName("gridLayout")
 
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         row = 0
         for c in self.label_classes:
@@ -78,7 +80,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             row += 1
 
         self.btnReset = QtWidgets.QPushButton(self.gridLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.btnReset.setSizePolicy(sizePolicy)
         self.btnReset.setMaximumSize(QtCore.QSize(200, 50))
         self.btnReset.setObjectName("btnReset")
@@ -88,7 +91,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout.addWidget(self.btnReset, 8, 1, 1, 1)
 
         self.btnNext = QtWidgets.QPushButton(self.gridLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.btnNext.setSizePolicy(sizePolicy)
         self.btnNext.setMaximumSize(QtCore.QSize(200, 50))
         self.btnNext.setObjectName("btnNext")
@@ -98,7 +102,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout.addWidget(self.btnNext, 10, 1, 1, 1)
 
         self.btnSkip = QtWidgets.QPushButton(self.gridLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.btnSkip.setSizePolicy(sizePolicy)
         self.btnSkip.setMaximumSize(QtCore.QSize(200, 50))
         self.btnSkip.setObjectName("btnSkip")
@@ -153,10 +158,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout.addWidget(widget, 10, 0, 1, 1)
 
         self.labelImageViewer = QtWidgets.QLabel(self.gridLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.labelImageViewer.setSizePolicy(sizePolicy)
         self.labelImageViewer.setText("")
-        self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
+        self.labelImageViewer.setPixmap(
+            QtGui.QPixmap("assets/placeholder.jpg"))
         self.labelImageViewer.setObjectName("labelImageViewer")
         self.labelImageViewer.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -220,7 +227,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             max_width = self.scroll.geometry().width() - 10
             max_height = self.scroll.geometry().height() - 10
 
-            pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+            pixmap = self.current_pixmap.scaled(
+                max_width, max_height, QtCore.Qt.KeepAspectRatio)
             self.labelImageViewer.setPixmap(pixmap)
 
     def btnZoomOut_Click(self):
@@ -265,7 +273,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             shutil.copyfile(source, destination)
 
             self.filesLabeled += 1
-            self.setWindowTitle(f'Image Labeler | {self.filesLabeled} files labeled')
+            self.setWindowTitle(
+                f'Image Labeler | {self.filesLabeled} files labeled')
 
             os.remove(source)
             self.fileCounter += 1
@@ -276,14 +285,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.__find_next_image()
         except StopIteration:
             self.next_image = None
-            self.labelImageViewer.setPixmap(QtGui.QPixmap("assets/placeholder.jpg"))
+            self.labelImageViewer.setPixmap(
+                QtGui.QPixmap("assets/placeholder.jpg"))
             self.current_pixmap = QtGui.QPixmap("assets/placeholder.jpg")
-            self.statusbar.showMessage("Finished. Every file traversed successfully.")
+            self.statusbar.showMessage(
+                "Finished. Every file traversed successfully.")
         else:
             self.__showImageInViewer()
 
         if self.next_image is not None:
-            self.statusbar.showMessage(f"Current File: {self.curr}{os.path.sep}{self.next_image}")
+            self.statusbar.showMessage(
+                f"Current File: {self.curr}{os.path.sep}{self.next_image}")
 
     def __find_next_image(self):
         nextImageFound = False
@@ -303,10 +315,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         max_width = self.scroll.geometry().width() - 10
         max_height = self.scroll.geometry().height() - 10
 
-        self.current_pixmap = QtGui.QPixmap(os.path.join(self.curr, self.next_image))
+        self.current_pixmap = QtGui.QPixmap(
+            os.path.join(self.curr, self.next_image))
 
         if self.current_pixmap.width() > max_width or self.current_pixmap.height() > max_height:
-            self.current_pixmap = self.current_pixmap.scaled(max_width, max_height, QtCore.Qt.KeepAspectRatio)
+            self.current_pixmap = self.current_pixmap.scaled(
+                max_width, max_height, QtCore.Qt.KeepAspectRatio)
 
         self.labelImageViewer.setPixmap(self.current_pixmap)
         self.scaleFactor = 1
