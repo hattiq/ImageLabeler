@@ -1,3 +1,6 @@
+> Note: If you're looking for a GUI tool to help with your Machine Learning data annotation task, please have a look at [LabelImg](https://github.com/tzutalin/labelImg) and [CVAT](https://github.com/openvinotoolkit/cvat). ImageLabeler (or rather ImageCategorizer coined by user @de-ar) does not export to standard annotation formats.
+
+
 # ImageLabeler
 
 GUI tool to label images. Labels are appended at the front of the image filename. The images are taken from a source directory and the labeled images are placed in the destination directory.
