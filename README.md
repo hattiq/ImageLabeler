@@ -4,24 +4,19 @@ GUI tool to label images. Labels are appended at the front of the image filename
 
 ![ImageLabeler Screenshot](https://i.imgur.com/p1tB2LK.jpg)
 
-## Dependencies
-
-* [PyQT5](https://pypi.org/project/PyQt5/ )
+### Installing dependencies
 
 ```sh
-$ pip install PyQt5
+$ pip install pipenv
+$ pipenv install
 ```
-
-## Usage
-
-> Use python>=3.6
 
 ### Configure
 
 `LABEL_CLASSES` in [ImageLabeler.py](./ImageLabeler.py) can be updated to configure the labeler.
 This is a `list`, with class names. The positions of the class names matter, as the buttons and labels will follow this positioning.
 
-### Run 
+### Run
 
 ```bash
 usage: ImageLabeler.py [-h] [-b BACKUP_DIRECTORY]
@@ -53,11 +48,12 @@ $ python ImageLabeler.py src_dir des_dir -b unlabeled_dir
 
 ## Demo
 
-Clone the repo. Run the demo using the following command. 
+Clone the repo. Run the demo using the following command.
 
 ```bash
 $ python ImageLabeler.py ./Demo/unsorted ./Demo/sorted -b ./Demo/unlabeled
 ```
 
 ## LabelFormatter
+
 You can define your own `LabelFormatter`. Check out [LabelUtilities.py](./LabelUtilities.py).

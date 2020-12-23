@@ -1,15 +1,15 @@
-import sys
 import argparse
 import os
+import sys
 
 from PyQt5 import QtWidgets
 
-from LabelUtilities import LabelFormatterInterface, ListPositionalLabelFormatter
+from LabelUtilities import (LabelFormatterInterface,
+                            ListPositionalLabelFormatter)
 from Ui_MainWindow import Ui_MainWindow
 
-
 # Positions matters
-LABEL_CLASSES = ["A", "B", "D", "P", "Bl", "Conflict"]
+LABEL_CLASSES = ["Red", "Green", "Blue"]
 
 
 class ImageLabeler:
@@ -76,7 +76,8 @@ if __name__ == "__main__":
 
     labeler = ImageLabeler()
 
-    assert os.path.isdir(args.source_directory), f'Directory "{args.source_directory} does not exist"'
+    assert os.path.isdir(
+        args.source_directory), f'Directory "{args.source_directory} does not exist"'
 
     os.makedirs(args.destination_directory, exist_ok=True)
     if args.backup_directory is not None:
